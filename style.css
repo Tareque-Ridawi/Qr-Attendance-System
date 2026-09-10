@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-/*
+
 :root{
     --body:#D1E8E2;
     --theme:#116466;
@@ -14,22 +14,22 @@
     --font-head:"Oswald", sans-serif;
     --font-body:"Poppins", sans-serif;
 }
-*/
 
+/*
 :root {
-    --body: #eaeaea;              /* Very light gray background */
-    --theme: #992f26;             /* Main coral color */
-    --theme-2: #cccccc;           /* Light gray (for softer secondary elements) */
-    --theme-1-03: rgba(230, 80, 70, 0.3);    /* Darker coral at 30% opacity */
-    --theme-2-03: rgba(204, 204, 204, 0.3);  /* Light gray at 30% opacity */
-    --accent: #a6a6a6;            /* Mid-light gray accent */
-    --font: #1a1a1a;              /* Very dark gray for text */
-    --link: #444444;              /* Dark gray links */
-    --link-2: #666666;            /* Medium gray for link hovers */
+    --body: #eaeaea;              
+    --theme: #992f26;             
+    --theme-2: #cccccc;           /
+    --theme-1-03: rgba(230, 80, 70, 0.3);    
+    --theme-2-03: rgba(204, 204, 204, 0.3);  
+    --accent: #a6a6a6;            
+    --font: #1a1a1a;              
+    --link: #444444;              
+    --link-2: #666666;            
     --font-head: "Oswald", sans-serif;
     --font-body: "Poppins", sans-serif;
 }
-
+*/
 body{
     font-family: var(--font-body);
     margin:0;
