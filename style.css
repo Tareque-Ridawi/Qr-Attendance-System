@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Julius+Sans+One&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
-
+/*
 :root{
     --body:#D1E8E2;
     --theme:#116466;
@@ -11,9 +11,26 @@
     --font:#2C3531;
     --link:#016064;
     --link-2:#01643e;
-    --font-head:"Oswald", sans-serif;
-    --font-body:"Poppins", sans-serif;
+    --font-head:"Julius Sans One", sans-serif;
+    --font-body:"Work Sans", sans-serif;
 }
+*/
+
+/*blue color theme*/
+:root{
+    --body:#EDE8F5;
+    --theme:#3D52A0;
+    --theme-2:#ADBBDA;
+    --theme-1-03:rgba(61, 82, 160,0.3);
+    --theme-2-03:rgba(173,187,218,0.3);
+    --accent:#7091E6;
+    --font:#8697C4;
+    --link:#016064;
+    --link-2:#01643e;
+    --font-head:"Julius Sans One", sans-serif;
+    --font-body:"Work Sans", sans-serif;
+}
+
 
 /*
 :root {
@@ -220,7 +237,7 @@ h2:nth-of-type(even) {
     justify-content: center;
     padding:10px 50px;
     font-size: 20px;
-    font-family: var(--font-body)
+    font-family: var(--font-body);
     border: 3px solid white;
     margin: 0 30px;
     border-radius: 12px;
