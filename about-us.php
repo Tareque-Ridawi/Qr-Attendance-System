@@ -45,7 +45,7 @@
             As an open-source project, we encourage collaboration and innovation. Developers, educators, and organizations are welcome to contribute, customize, and implement the system to meet their unique needs.
         </div>
         
-        <div class="abt-hdr">Meet the Super Developer Team</div>
+        <div class="abt-hdr">Meet the Red Hat Developer Team</div>
 
         <div class="devs-all-cont">
             <div class="dev-cont">
