@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $user_id = trim($_POST['user_id']);
     $email = trim($_POST['email']);
     $pass = trim($_POST['pass']);
+    $password_hash = password_hash($pass, PASSWORD_DEFAULT);
 
     if (!empty($user_name) && !empty($user_id) && !empty($email) && !empty($pass)) {
         // Check if username already exists
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         // Insert new instructor
         $query = "INSERT INTO users (user_name, password, name, instructor, email) 
-                  VALUES ('$user_id', '$pass', '$user_name', 1, '$email')";
+                  VALUES ('$user_id', '$password_hash', '$user_name', 1, '$email')";
 
         if (mysqli_query($con, $query)) {
                 header("Location: ../access-pages/sign-in-te.php");

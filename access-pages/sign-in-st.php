@@ -8,16 +8,30 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $pass = $_POST['pass'];
 
     if (!empty($user_name) && !empty($pass)) {
-        $query = "SELECT * FROM users WHERE user_name = '$user_name' AND password = '$pass' AND instructor = 0 LIMIT 1";
+        $user_name = mysqli_real_escape_string($con, $user_name);
+        $query = "SELECT * FROM users WHERE user_name = '$user_name' AND instructor = 0 LIMIT 1";
         $result = mysqli_query($con, $query);
         
         if ($result && mysqli_num_rows($result) > 0) {
-            $_SESSION['user_id'] = $user_name;
-            echo "Login successful!";
-            // Redirect to dashboard or homepage
-            header("Location: ../client-pages/student-dash.php");
-            exit();
-        } else {
+            $user_data = mysqli_fetch_assoc($result);
+            $password_valid = password_verify($pass, $user_data['password']);
+
+            // Upgrade passwords created before password hashing was enabled.
+            if (!$password_valid && hash_equals((string) $user_data['password'], $pass)) {
+                $password_hash = mysqli_real_escape_string($con, password_hash($pass, PASSWORD_DEFAULT));
+                mysqli_query($con, "UPDATE users SET password = '$password_hash' WHERE id = '{$user_data['id']}'");
+                $password_valid = true;
+            }
+
+            if ($password_valid) {
+                $_SESSION['user_id'] = $user_name;
+                echo "Login successful!";
+                header("Location: ../client-pages/student-dash.php");
+                exit();
+            }
+        }
+
+        if (!$result || mysqli_num_rows($result) === 0 || !$password_valid) {
             echo "Invalid username or password.";
         }
     } else {

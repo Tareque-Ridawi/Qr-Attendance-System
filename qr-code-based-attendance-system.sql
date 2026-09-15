@@ -145,7 +145,7 @@ INSERT INTO `enrollments` (`id`, `course_id`, `student_id`) VALUES
 CREATE TABLE `users` (
   `id` bigint(20) NOT NULL,
   `user_name` varchar(30) NOT NULL,
-  `password` varchar(30) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `instructor` tinyint(1) NOT NULL,
   `name` text NOT NULL,
   `email` varchar(255) NOT NULL DEFAULT ''
