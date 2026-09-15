@@ -11,30 +11,23 @@ if (isset($_GET['course_id']) && !empty($_GET['course_id'])) {
     exit();  // Stop execution if course_id is missing
 }
 
-// Escape the course_id to prevent SQL injection
+// Load the course only when it belongs to the logged-in instructor.
 $course_id = $con->real_escape_string($course_id);
-
-// SQL Query to get course title by course_id
-$sql = "SELECT course_title FROM courses WHERE id = '$course_id' LIMIT 1";
+$instructor_id = $con->real_escape_string($user_data['user_name']);
+$sql = "SELECT course_title, course_id
+        FROM courses
+        WHERE id = '$course_id' AND instructor_id = '$instructor_id'
+        LIMIT 1";
 $result = $con->query($sql);
 
-if ($result && $result->num_rows > 0) {
-    $course = $result->fetch_assoc();
-    $course_title = $course['course_title']; // Store course title
-} else {
-    $course_title = "Course not found"; // Default message if course not found
+if (!$result || $result->num_rows === 0) {
+    http_response_code(403);
+    exit("You are not authorized to view this course.");
 }
 
-// Get Course Code from Sql
-$sql = "SELECT course_id FROM courses WHERE id = '$course_id' LIMIT 1";
-$result = $con->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    $course = $result->fetch_assoc();
-    $course_code = $course['course_id']; // Store course title
-} else {
-    $course_code = "Course not found"; // Default message if course not found
-}
+$course = $result->fetch_assoc();
+$course_title = $course['course_title'];
+$course_code = $course['course_id'];
 
 $date = $con->real_escape_string($_GET['date']);
 

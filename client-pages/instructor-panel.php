@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["course_id"]) && isset(
 // Delete Course
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_course"])) {
     $course_id = $con->real_escape_string($_POST["delete_course"]);
-    $sql = "DELETE FROM courses WHERE id = '$course_id'";
+    $sql = "DELETE FROM courses WHERE id = '$course_id' AND instructor_id = '$instructor_id'";
     if ($con->query($sql) === TRUE) {
         header("Location: " . $_SERVER["PHP_SELF"]);
         exit;

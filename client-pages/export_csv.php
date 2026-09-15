@@ -2,6 +2,7 @@
 session_start();
 include("../includes/connection.php");
 include("../includes/functions.php");
+$user_data = check_loginins($con);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['export_course'])) {
     $course_id = $con->real_escape_string($_POST['export_course']);
@@ -9,6 +10,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['export_course'])) {
     die("No course selected.");
 }
 
+$instructor_id = $con->real_escape_string($user_data['user_name']);
+$course_sql = "SELECT course_id FROM courses
+               WHERE course_id = '$course_id' AND instructor_id = '$instructor_id'
+               LIMIT 1";
+$course_result = $con->query($course_sql);
+if (!$course_result || $course_result->num_rows === 0) {
+    http_response_code(403);
+    die("You are not authorized to export this course.");
+}
+
+$course_id = $course_result->fetch_assoc()['course_id'];
 
 // Get unique students for that course
 $student_sql = "SELECT DISTINCT student_id FROM attendance WHERE course_id = '$course_id'";

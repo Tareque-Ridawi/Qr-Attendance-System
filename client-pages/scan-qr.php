@@ -12,27 +12,25 @@ if (isset($_GET['course_id']) && !empty($_GET['course_id'])) {
     exit();  // Stop execution if course_id is missing
 }
 
-// Escape the course_id to prevent SQL injection
+// Load the course only when it belongs to the logged-in instructor.
 $course_id = $con->real_escape_string($course_id);
+$instructor_id = $con->real_escape_string($user_data['user_name']);
+$course_sql = "SELECT course_title, course_id
+               FROM courses
+               WHERE id = '$course_id' AND instructor_id = '$instructor_id'
+               LIMIT 1";
+$course_result = $con->query($course_sql);
 
-// SQL Query to get course title by course_id
-$sql = "SELECT course_title FROM courses WHERE id = '$course_id' LIMIT 1";
-$result = $con->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    $course = $result->fetch_assoc();
-    $course_title = $course['course_title']; // Store course title
-} else {
-    $course_title = "Course not found"; // Default message if course not found
+if (!$course_result || $course_result->num_rows === 0) {
+    http_response_code(403);
+    exit("You are not authorized to access this course.");
 }
 
-// ✅ Get course_code from courses table
-$course_code = null; // Initialize variable
-$course_sql = "SELECT course_id FROM courses WHERE id = '$course_id' LIMIT 1";
-$course_result = $con->query($course_sql);
-if ($course_result && $course_result->num_rows > 0) {
-    $course_row = $course_result->fetch_assoc();
-    $course_code = $course_row['course_id'];
+$course = $course_result->fetch_assoc();
+$course_title = $course['course_title'];
+$course_code = $course['course_id'];
+
+if ($course_code) {
     // ✅ Auto-mark all students as Absent on page load (if not already marked)
     $date = date("Y-m-d");
     $time = "00:00:00";
