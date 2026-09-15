@@ -133,23 +133,28 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
 <body>
     <main>
         <div class="course-qr">
-            <div class="course-title-qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path d="M96 0C43 0 0 43 0 96L0 416c0 53 43 96 96 96l288 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64c17.7 0 32-14.3 32-32l0-320c0-17.7-14.3-32-32-32L384 0 96 0zm0 384l256 0 0 64L96 448c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16zm16 48l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z" />
+            <div class="course-title-qr"><svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                    <path
+                        d="M96 0C43 0 0 43 0 96L0 416c0 53 43 96 96 96l288 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64c17.7 0 32-14.3 32-32l0-320c0-17.7-14.3-32-32-32L384 0 96 0zm0 384l256 0 0 64L96 448c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16zm16 48l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z" />
                 </svg> <?php echo $course_title; ?></div>
             <div class="time-title">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
+                    <path
+                        d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
                 </svg>
                 <span id="time">Loading...</span> &nbsp &nbsp &nbsp
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                    <path d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z" />
+                    <path
+                        d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z" />
                 </svg>
                 <span id="date">Loading...</span>
             </div>
         </div>
 
         <div class="main-qr-container">
-            <p class="qr-info">Scan The Qr Code With your device while logged in with your ID to get your attendance counted</p>
+            <p class="qr-info">Scan The Qr Code With your device while logged in with your ID to get your attendance
+                counted</p>
             <div class="qr-scan">
                 <img src="../assets/logo.png" alt="">
             </div>
@@ -189,17 +194,17 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
         const course_id = <?php echo json_encode($course_id); ?>;
         let currentQRText = null; // Global variable for QR text
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const qrContainer = document.querySelector(".qr-scan");
 
             function generateQRCodeString() {
                 const chars = "abcdefghijklmnopqrstuvwxyz";
                 const digits = "0123456789";
                 return Array.from({
-                        length: 6
-                    }, (_, i) =>
+                    length: 6
+                }, (_, i) =>
                     i % 2 === 0 ? digits[Math.floor(Math.random() * digits.length)] :
-                    chars[Math.floor(Math.random() * chars.length)]
+                        chars[Math.floor(Math.random() * chars.length)]
                 ).join('');
             }
 
@@ -235,16 +240,16 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const firebaseConfig = {
-                apiKey: "AIzaSyAiu3Psww6S95HXZAExQcKr0WB7Hb8bhhQ",
-                authDomain: "qr-attendance-34479.firebaseapp.com",
-                databaseURL: "https://qr-attendance-34479-default-rtdb.firebaseio.com",
-                projectId: "qr-attendance-34479",
-                storageBucket: "qr-attendance-34479.firebasestorage.app",
-                messagingSenderId: "472523260246",
-                appId: "1:472523260246:web:324e97172fc910f0dad6f7",
-                measurementId: "G-QDH7859V5K"
+                apiKey: "AIzaSyCuJLsLu_dgDdkjLNeEHcub8O1PniGxtWY",
+                authDomain: "qr-attendance-system-ecf60.firebaseapp.com",
+                databaseURL: "https://qr-attendance-system-ecf60-default-rtdb.firebaseio.com",
+                projectId: "qr-attendance-system-ecf60",
+                storageBucket: "qr-attendance-system-ecf60.firebasestorage.app",
+                messagingSenderId: "617612548435",
+                appId: "1:617612548435:web:33404aa6d0fffd5a8da9a6",
+                measurementId: "G-2RCS482LDJ"
             };
 
             //  Initialize Firebase
@@ -273,12 +278,12 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
 
                     if (data.qr_data === currentQRText) {
                         fetch(window.location.href, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/x-www-form-urlencoded"
-                                },
-                                body: `student_id=${encodeURIComponent(data.student_id)}&qr_data=${encodeURIComponent(data.qr_data)}&course_id=${encodeURIComponent(course_id)}`
-                            })
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: `student_id=${encodeURIComponent(data.student_id)}&qr_data=${encodeURIComponent(data.qr_data)}&course_id=${encodeURIComponent(course_id)}`
+                        })
                             .then(response => response.json())
                             .then(result => {
                                 if (result.success) {
@@ -318,52 +323,52 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                 });
 
         });
-        
-             // Corrected Time API Handling
-             
-             const timeElement = document.getElementById("time");
-             const dateElement = document.getElementById("date");
 
-             async function fetchTime() {
-                 try {
-                     const response = await fetch("https://worldtimeapi.org/api/timezone/UTC");
-                     if (!response.ok) throw new Error('API Error');
+        // Corrected Time API Handling
 
-                     const data = await response.json();
-                     const dateTime = new Date(data.datetime);
+        const timeElement = document.getElementById("time");
+        const dateElement = document.getElementById("date");
 
-                     // Format time with leading zeros
-                     const timeStr = dateTime.toLocaleTimeString('en-IN', {
-                         hour: '2-digit',
-                         minute: '2-digit',
-                         second: '2-digit',
-                         hour12: false
-                     });
+        async function fetchTime() {
+            try {
+                const response = await fetch("https://worldtimeapi.org/api/timezone/UTC");
+                if (!response.ok) throw new Error('API Error');
 
-                     // Format date as DD/MM/YYYY
-                     const dateStr = dateTime.toLocaleDateString('en-IN', {
-                         day: '2-digit',
-                         month: '2-digit',
-                         year: 'numeric'
-                     }).replace(/\//g, '/');
+                const data = await response.json();
+                const dateTime = new Date(data.datetime);
 
-                     if (timeElement && dateElement) {
-                         timeElement.textContent = timeStr;
-                         dateElement.textContent = dateStr;
-                     }
-                 } catch (error) {
-                     console.log("Using local time");
-                     // Fallback to client time
-                     const now = new Date();
-                     timeElement.textContent = now.toLocaleTimeString();
-                     dateElement.textContent = now.toLocaleDateString();
-                 }
-             }
+                // Format time with leading zeros
+                const timeStr = dateTime.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
 
-             // Initial call and update every second
-             fetchTime();
-             setInterval(fetchTime, 1000);
-             
+                // Format date as DD/MM/YYYY
+                const dateStr = dateTime.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }).replace(/\//g, '/');
+
+                if (timeElement && dateElement) {
+                    timeElement.textContent = timeStr;
+                    dateElement.textContent = dateStr;
+                }
+            } catch (error) {
+                console.log("Using local time");
+                // Fallback to client time
+                const now = new Date();
+                timeElement.textContent = now.toLocaleTimeString();
+                dateElement.textContent = now.toLocaleDateString();
+            }
+        }
+
+        // Initial call and update every second
+        fetchTime();
+        setInterval(fetchTime, 1000);
+
     </script>
 
 </body>
