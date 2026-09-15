@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
             </ul>
         </li>
         <li class="nav-btn">
-            <ul><a href="../access-pages/sign-in-st.php"><button id="tr-s-btn">Logout</button></a></ul>
+            <ul><a href="../access-pages/logout.php"><button id="tr-s-btn">Logout</button></a></ul>
         </li>
     </nav>
     <main>
