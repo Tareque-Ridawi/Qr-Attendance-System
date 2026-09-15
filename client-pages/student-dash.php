@@ -96,14 +96,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
         <li>
             <ul class="dboard">Dashboard</ul>
             <ul>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z" />
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                    <path
+                        d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z" />
                 </svg>
                 <div id="std-name"><?php echo htmlspecialchars($user_data['name']); ?></div>
             </ul>
             <ul>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path d="M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9l0 28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5l0-24.6c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z" />
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 640 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                    <path
+                        d="M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9l0 28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5l0-24.6c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z" />
                 </svg>
                 <div>Student</div>
             </ul>
@@ -168,7 +172,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
         <div class="courses">
             <p class="course-e">Courses Enrolled:</p>
             <p class="c-info">
-                Note : Only Instructrors can enroll and unenroll students. Contact your instructor for making any changes.
+                Note : Only Instructrors can enroll and unenroll students. Contact your instructor for making any
+                changes.
             </p>
             <?php
             if ($result->num_rows > 0) {
@@ -257,13 +262,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                 <span class="abt-std-btn">Edit</span>
             </div>
             <div class="center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z" />
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                    <path
+                        d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z" />
                 </svg>
             </div>
-            <div class="abt-std-info"><span>Name</span><span><?php echo htmlspecialchars($user_data['name']); ?></span></div>
-            <div class="abt-std-info"><span>ID</span><span><?php echo htmlspecialchars($user_data['user_name']); ?></span></div>
-            <div class="abt-std-info"><span>E-mail</span><span><?php echo htmlspecialchars($user_data['email']); ?></span></div>
+            <div class="abt-std-info"><span>Name</span><span><?php echo htmlspecialchars($user_data['name']); ?></span>
+            </div>
+            <div class="abt-std-info">
+                <span>ID</span><span><?php echo htmlspecialchars($user_data['user_name']); ?></span></div>
+            <div class="abt-std-info">
+                <span>E-mail</span><span><?php echo htmlspecialchars($user_data['email']); ?></span></div>
         </div>
 
 
@@ -280,7 +290,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                 </label>
                 <label for="user_name">
                     ID:
-                    <input readonly type="text" id="user_name" required placeholder="ID Can't be changed" name="user_name">
+                    <input readonly type="text" id="user_name" required placeholder="ID Can't be changed"
+                        name="user_name">
                 </label>
                 <input type="submit" value="Change">
             </form>
@@ -301,11 +312,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
         /*-------------------------------------------------
         Edit form
         ---------------------------------------------------*/
-        document.querySelector(".info-edit").addEventListener("click", function() {
+        document.querySelector(".info-edit").addEventListener("click", function () {
             document.querySelector(".edit-user-form").style.display = "flex";
         });
 
-        document.querySelector(".info-edit").addEventListener("click", function() {
+        document.querySelector(".info-edit").addEventListener("click", function () {
             // Create overlay if it doesn't exist
             let overlay = document.querySelector(".custom-overlay");
             if (!overlay) {
@@ -314,7 +325,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                 document.body.appendChild(overlay);
 
                 // Add click event to remove overlay and hide form
-                overlay.addEventListener("click", function() {
+                overlay.addEventListener("click", function () {
                     document.querySelector(".edit-user-form").style.display = "none";
                     overlay.remove();
                 });
@@ -360,17 +371,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             //  Firebase Configuration
             const firebaseConfig = {
-                apiKey: "AIzaSyAiu3Psww6S95HXZAExQcKr0WB7Hb8bhhQ",
-                authDomain: "qr-attendance-34479.firebaseapp.com",
-                databaseURL: "https://qr-attendance-34479-default-rtdb.firebaseio.com",
-                projectId: "qr-attendance-34479",
-                storageBucket: "qr-attendance-34479.firebasestorage.app",
-                messagingSenderId: "472523260246",
-                appId: "1:472523260246:web:324e97172fc910f0dad6f7",
-                measurementId: "G-QDH7859V5K"
+                apiKey: "AIzaSyCuJLsLu_dgDdkjLNeEHcub8O1PniGxtWY",
+                authDomain: "qr-attendance-system-ecf60.firebaseapp.com",
+                databaseURL: "https://qr-attendance-system-ecf60-default-rtdb.firebaseio.com",
+                projectId: "qr-attendance-system-ecf60",
+                storageBucket: "qr-attendance-system-ecf60.firebasestorage.app",
+                messagingSenderId: "617612548435",
+                appId: "1:617612548435:web:33404aa6d0fffd5a8da9a6",
+                measurementId: "G-2RCS482LDJ"
             };
 
             //  Initialize Firebase
@@ -380,7 +391,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
             //  QR Code Scanner (Click on Logo to Scan)
             const img = document.querySelector('img[alt="Main Logo"]');
 
-            img.addEventListener("click", function() {
+            img.addEventListener("click", function () {
                 const overlay = document.createElement("div");
                 overlay.style.position = "fixed";
                 overlay.style.top = "0";
@@ -407,8 +418,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
 
                 const html5QrCode = new Html5Qrcode("qr-reader");
                 html5QrCode.start({
-                        facingMode: "environment"
-                    }, // Back Camera
+                    facingMode: "environment"
+                }, // Back Camera
                     {
                         fps: 10,
                         qrbox: 250
@@ -428,10 +439,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                         html5QrCode.stop();
                         overlay.remove();
                     },
-                    (error) => {}
+                    (error) => { }
                 );
 
-                overlay.addEventListener("click", function(e) {
+                overlay.addEventListener("click", function (e) {
                     if (e.target === overlay) {
                         html5QrCode.stop();
                         overlay.remove();
