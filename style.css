@@ -984,7 +984,7 @@ Responsive Design
         box-sizing: border-box;
     }
     .mbl-nav-head p{
-        font-size: 20px;
+        font-size: 15px;
         font-weight: bold;
         font-family: var(--font-head);
         text-shadow: 0 0 6px var(--theme);
