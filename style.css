@@ -482,7 +482,9 @@ About Us Page Styles
     width:20px;
     fill:var(--body);
 }
-
+.abt-txt{
+    text-align: justify;
+}
 
 
 /* -------------------------------------------------------------------------------------
@@ -1121,7 +1123,7 @@ Responsive Design
         margin:20px 30px;
     }
     .faq-ques{
-        font-size:30px;
+        font-size:15px;
     }
     .faq-ans{
         font-size:12px;
@@ -1136,7 +1138,7 @@ Responsive Design
         font-size: 15px;
     }
     .devs-all-cont{
-        margin: 15px 50px;;
+        margin: 15px 20px;;
     }
     .dev-cont{
         flex-direction: column;
@@ -1161,6 +1163,9 @@ Responsive Design
     }
     .dev-btn-cont button{
         font-size:12px;
+    }
+    .abt-hdr{
+        font-size:25px;
     }
 
 
