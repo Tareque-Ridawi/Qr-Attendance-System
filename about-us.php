@@ -53,7 +53,7 @@
                 <div class="dev-des animateL">
                     <p class="dev-name">Tareque Ridawi</p>
                     <p class="dev-role">Backend Developer</p>
-                    <p class="dev-abt"> Tareque is the backbone of the system, responsible for designing and implementing the server-side logic, database architecture, and API integrations. His expertise in PHP and MySQL ensures the system is fast, reliable, and secure.</p>
+                    <p class="dev-abt"> Tareque drives the project’s core PHP backend, developing the server-side logic, database structure, and API integrations that keep the system fast, reliable, and secure. His strong command of PHP, MySQL, and backend architecture makes the platform work smoothly behind the scenes.</p>
                     <div class="dev-btn-cont">
                         <button class="linked-in">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
@@ -72,7 +72,7 @@
                 <div class="dev-des animateL2">
                     <p class="dev-name">Ataullah Gani Al Hossaini</p>
                     <p class="dev-role">Front-End Developer</p>
-                    <p class="dev-abt"> Ataullah is the creative force behind the system’s user interface. With a keen eye for design and usability, he has crafted an intuitive and responsive front-end using HTML, CSS, JavaScript, and modern frameworks.</p>
+                    <p class="dev-abt"> Ataullah took the project’s front-end further by converting the interface into a dynamic PHP-driven experience, improving usability and making the pages function smoothly with the system.</p>
                     <div class="dev-btn-cont">
                         <button class="linked-in">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
@@ -91,7 +91,7 @@
                 <div class="dev-des animateL3">
                     <p class="dev-name">Abidur Rahaman</p>
                     <p class="dev-role">Front-End Developer</p>
-                    <p class="dev-abt"> Abid shapes the user-facing experience of the system, building responsive layouts and intuitive interfaces with HTML, CSS, JavaScript, and modern front-end practices to make the application easy and enjoyable to use.</p>
+                    <p class="dev-abt"> Abid created the project’s original front-end design, shaping the main visual style and layout that later became the foundation for the website’s overall look.</p>
                     <div class="dev-btn-cont">
                         <button class="linked-in">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
@@ -110,7 +110,7 @@
                 <div class="dev-des animateL3">
                     <p class="dev-name">Dipta Chowdhury</p>
                     <p class="dev-role">Database Developer</p>
-                    <p class="dev-abt"> Dipta is responsible for designing and managing the project’s data structure, tables, and query logic. His work ensures data integrity, reliable storage, and efficient retrieval across the attendance system.</p>
+                    <p class="dev-abt"> Dipta is responsible for designing and managing the project’s data structure, tables, and query logic. His work ensures data integrity, reliable storage, and efficient retrieval across the attendance system, and he also contributed to the website’s animation effects.</p>
                     <div class="dev-btn-cont">
                         <button class="linked-in">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
@@ -129,7 +129,7 @@
                 <div class="dev-des animateL3">
                     <p class="dev-name">Hamidur Rahman</p>
                     <p class="dev-role">API Integration Developer</p>
-                    <p class="dev-abt"> Hamid connects the system’s front-end and back-end by integrating APIs, managing data exchange, and ensuring seamless communication between modules and third-party services.</p>
+                    <p class="dev-abt"> Hamid worked on integrating external APIs into the website and also designed the login and signup pages with proper validation for a smoother, more secure experience.</p>
                     <div class="dev-btn-cont">
                         <button class="linked-in">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
