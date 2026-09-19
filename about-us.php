@@ -89,7 +89,7 @@
             <div class="dev-cont">
                 <img src="./assets/dev-3.png" alt="Abid" class="dev-img animateR3">
                 <div class="dev-des animateL3">
-                    <p class="dev-name">Abidur Rahman</p>
+                    <p class="dev-name">Abidur Rahaman</p>
                     <p class="dev-role">Front-End Developer</p>
                     <p class="dev-abt"> Abid shapes the user-facing experience of the system, building responsive layouts and intuitive interfaces with HTML, CSS, JavaScript, and modern front-end practices to make the application easy and enjoyable to use.</p>
                     <div class="dev-btn-cont">
