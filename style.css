@@ -311,7 +311,18 @@ footer span{
     padding: 3px 6px;
     border-radius: 4px;
 }
-
+del-1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding:10px 50px;
+    font-size: 20px;
+    font-family: var(--font-body);
+    border: 3px solid white;
+    margin: 0 30px;
+    border-radius: 12px;
+}
 
 /* -------------------------------------------------------------------------------------
 Docs Page Styles
