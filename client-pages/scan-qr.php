@@ -30,6 +30,28 @@ $course = $course_result->fetch_assoc();
 $course_title = $course['course_title'];
 $course_code = $course['course_id'];
 
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['set_scan_location'])) {
+    header('Content-Type: application/json');
+    $latitude = $_POST['latitude'] ?? null;
+    $longitude = $_POST['longitude'] ?? null;
+
+    if (!is_numeric($latitude) || !is_numeric($longitude)
+        || (float) $latitude < -90 || (float) $latitude > 90
+        || (float) $longitude < -180 || (float) $longitude > 180) {
+        http_response_code(400);
+        echo json_encode(["error" => "A valid instructor location is required."]);
+        exit();
+    }
+
+    $_SESSION['scan_location'][$course_id] = [
+        "latitude" => (float) $latitude,
+        "longitude" => (float) $longitude,
+        "captured_at" => time()
+    ];
+    echo json_encode(["success" => true]);
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_attendance'])) {
     header('Content-Type: application/json');
     $attendance_date = date("Y-m-d");
@@ -82,6 +104,37 @@ if ($course_code && ($_SESSION['deleted_attendance_date'][$course_id] ?? null) !
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student_id']) && isset($_POST['qr_data'])) {
     $student_id = $con->real_escape_string($_POST['student_id']);
     $qr_data = $con->real_escape_string($_POST['qr_data']);
+    $student_latitude = $_POST['latitude'] ?? null;
+    $student_longitude = $_POST['longitude'] ?? null;
+    $instructor_location = $_SESSION['scan_location'][$course_id] ?? null;
+
+    if (!is_numeric($student_latitude) || !is_numeric($student_longitude)
+        || (float) $student_latitude < -90 || (float) $student_latitude > 90
+        || (float) $student_longitude < -180 || (float) $student_longitude > 180) {
+        http_response_code(400);
+        echo json_encode(["error" => "Student location is unavailable. Allow location access and scan again."]);
+        exit();
+    }
+
+    if (!$instructor_location || time() - $instructor_location['captured_at'] > 300) {
+        http_response_code(409);
+        echo json_encode(["error" => "Instructor location is unavailable or expired. Refresh the attendance page."]);
+        exit();
+    }
+
+    $latitude_delta = deg2rad((float) $student_latitude - $instructor_location['latitude']);
+    $longitude_delta = deg2rad((float) $student_longitude - $instructor_location['longitude']);
+    $haversine = sin($latitude_delta / 2) ** 2
+        + cos(deg2rad($instructor_location['latitude']))
+        * cos(deg2rad((float) $student_latitude))
+        * sin($longitude_delta / 2) ** 2;
+    $distance_meters = 6371000 * 2 * atan2(sqrt($haversine), sqrt(1 - $haversine));
+
+    if ($distance_meters > 150) {
+        http_response_code(403);
+        echo json_encode(["error" => "Attendance can only be recorded near the instructor's location."]);
+        exit();
+    }
 
     // Initialize std_id to avoid undefined variable
     $std_id = null;
@@ -191,6 +244,8 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             <div class="qr-scan">
                 <img src="../assets/logo.png" alt="">
             </div>
+            <p id="location-status" role="status">Getting instructor location before generating the attendance QR code...</p>
+            <button class="page-action" id="retry-location-button" type="button">Retry Location</button>
             <div class="qr-reset-time">
                 Code Resets in <span>15</span> Seconds
             </div>
@@ -252,6 +307,66 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
 
         document.addEventListener("DOMContentLoaded", function () {
             const qrContainer = document.querySelector(".qr-scan");
+            const locationStatus = document.getElementById("location-status");
+            const retryLocationButton = document.getElementById("retry-location-button");
+
+            function getBrowserLocation() {
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error("This browser does not provide location services."));
+                        return;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: false,
+                        maximumAge: 30000,
+                        timeout: 15000
+                    });
+                });
+            }
+
+            async function captureInstructorLocation(showProgress = true) {
+                if (showProgress) {
+                    locationStatus.textContent = "Getting instructor location...";
+                    retryLocationButton.disabled = true;
+                }
+
+                try {
+                    const position = await getBrowserLocation();
+                    const response = await fetch(window.location.href, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            set_scan_location: "1",
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        })
+                    });
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.error || "Could not save the instructor location.");
+                    }
+                    locationStatus.textContent = "Instructor location ready. GPS is not specifically required.";
+                    return true;
+                } catch (error) {
+                    locationStatus.textContent = error.message || "Location unavailable. Allow browser location access and retry.";
+                    throw error;
+                } finally {
+                    retryLocationButton.disabled = false;
+                }
+            }
+
+            retryLocationButton.addEventListener("click", async () => {
+                try {
+                    await captureInstructorLocation();
+                    if (!qrContainer.querySelector("canvas, img")) {
+                        generateQRCode();
+                        startCountdown();
+                    }
+                } catch (error) {
+                    // Keep the QR code unavailable until an instructor location has been stored.
+                }
+            });
 
             function generateQRCodeString() {
                 const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -291,8 +406,13 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             }
 
             if (qrContainer) {
-                generateQRCode();
-                startCountdown();
+                captureInstructorLocation()
+                    .then(() => {
+                        generateQRCode();
+                        startCountdown();
+                        window.setInterval(() => captureInstructorLocation(false).catch(() => {}), 60000);
+                    })
+                    .catch(() => {});
             }
         });
 
@@ -338,7 +458,13 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                             headers: {
                                 "Content-Type": "application/x-www-form-urlencoded"
                             },
-                            body: `student_id=${encodeURIComponent(data.student_id)}&qr_data=${encodeURIComponent(data.qr_data)}&course_id=${encodeURIComponent(course_id)}`
+                            body: new URLSearchParams({
+                                student_id: data.student_id,
+                                qr_data: data.qr_data,
+                                course_id: course_id,
+                                latitude: data.latitude,
+                                longitude: data.longitude
+                            })
                         })
                             .then(response => response.json())
                             .then(result => {
@@ -365,7 +491,7 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                                     updateTable.insertBefore(newRow, head.nextSibling);
 
                                 } else {
-                                    alert("❌ Failed to record attendance.");
+                                    alert(result.error || "Failed to record attendance.");
                                 }
                             })
                             .catch(error => console.error("❌ Fetch error:", error));

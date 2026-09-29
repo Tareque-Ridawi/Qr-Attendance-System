@@ -383,7 +383,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
             //  QR Code Scanner (Click on Logo to Scan)
             const img = document.querySelector('img[alt="Main Logo"]');
 
-            img.addEventListener("click", function () {
+            img.addEventListener("click", async function () {
+                let studentPosition;
+                try {
+                    if (!navigator.geolocation) {
+                        throw new Error("This browser does not provide location services.");
+                    }
+                    studentPosition = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            enableHighAccuracy: false,
+                            maximumAge: 30000,
+                            timeout: 15000
+                        });
+                    });
+                } catch (error) {
+                    alert("Location is required to record attendance. Allow browser location access and try again. GPS is not specifically required.");
+                    return;
+                }
+
                 const overlay = document.createElement("div");
                 overlay.style.position = "fixed";
                 overlay.style.top = "0";
@@ -421,6 +438,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                         db.ref("attendance").push({
                             student_id: "<?= $user_data['id']; ?>",
                             qr_data: decodedText,
+                            latitude: studentPosition.coords.latitude,
+                            longitude: studentPosition.coords.longitude,
+                            location_accuracy: studentPosition.coords.accuracy,
                             timestamp: new Date().toISOString()
                         }).then(() => {
                             alert("Scan successful!");
