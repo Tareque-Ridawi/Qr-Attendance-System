@@ -211,15 +211,7 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
         </div>
 
     </main>
-    <footer>
-        <div class="logo-container">
-            <img src="../assets/logo.png" alt="">
-        </div>
-        <div class="foot-info">
-            <p class="foot-title">QR Code Based Attendance System</p>
-            <p class="foot-abt">&copy; 2025 . All Rights Reserved . Developed by <span>Super Developer</span></p>
-        </div>
-    </footer>
+    <?php include("../includes/footer.php"); ?>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
