@@ -144,6 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
+        <div class="page-actions">
+            <a class="page-action" href="instructor-panel.php">Back to Instructor Panel</a>
+        </div>
+
         <div class="qr-updates">
             <div class="abt-std-top mrg-btm act">
                 <span class="abt-std-in flex cust">Students Enrolled</span>

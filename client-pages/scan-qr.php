@@ -30,6 +30,46 @@ $course = $course_result->fetch_assoc();
 $course_title = $course['course_title'];
 $course_code = $course['course_id'];
 
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['undo_last_scan'])) {
+    header('Content-Type: application/json');
+    $undo = $_SESSION['last_scan_undo'] ?? null;
+
+    if (!$undo || $undo['course_id'] !== (string) $course_id) {
+        http_response_code(400);
+        echo json_encode(["error" => "There is no recent scan to undo for this course."]);
+        exit();
+    }
+
+    if ($undo['previous_status'] === null) {
+        $undo_stmt = $con->prepare("DELETE FROM attendance
+                                    WHERE id = ? AND course_id = ? AND student_id = ?
+                                      AND date = ? AND time = ? AND status = 'Present'");
+        $undo_stmt->bind_param("issss", $undo['attendance_id'], $course_code, $undo['student_id'], $undo['date'], $undo['scan_time']);
+    } else {
+        $undo_stmt = $con->prepare("UPDATE attendance
+                                    SET status = ?, time = ?
+                                    WHERE id = ? AND course_id = ? AND student_id = ?
+                                      AND date = ? AND time = ? AND status = 'Present'");
+        $undo_stmt->bind_param("ssissss", $undo['previous_status'], $undo['previous_time'], $undo['attendance_id'], $course_code, $undo['student_id'], $undo['date'], $undo['scan_time']);
+    }
+
+    if ($undo_stmt && $undo_stmt->execute() && $undo_stmt->affected_rows === 1) {
+        unset($_SESSION['last_scan_undo']);
+        echo json_encode(["success" => true, "std_id" => $undo['student_id']]);
+    } else {
+        unset($_SESSION['last_scan_undo']);
+        http_response_code(409);
+        echo json_encode(["error" => "The attendance record changed, so the scan could not be undone."]);
+    }
+    if ($undo_stmt) {
+        $undo_stmt->close();
+    }
+    exit();
+}
+
+$can_undo_scan = isset($_SESSION['last_scan_undo'])
+    && $_SESSION['last_scan_undo']['course_id'] === (string) $course_id;
+
 if ($course_code) {
     // ✅ Auto-mark all students as Absent on page load (if not already marked)
     $date = date("Y-m-d");
@@ -85,26 +125,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student_id']) && isset
     $date = date("Y-m-d");
     $time = date("H:i:s");
 
+    unset($_SESSION['last_scan_undo']);
+
     //  Update attendance if already marked as Absent, else insert as Present
-    $check_sql = "SELECT id FROM attendance 
+    $check_sql = "SELECT id, status, time FROM attendance 
 WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' LIMIT 1";
     $check_result = $con->query($check_sql);
 
     if ($check_result && $check_result->num_rows > 0) {
-        //  Already exists: update status and time
-        $update_sql = "UPDATE attendance 
-     SET status = 'Present', time = '$time' 
-     WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date'";
-        if ($con->query($update_sql)) {
-            echo json_encode(["success" => true, "std_id" => $std_id, "updated" => true]);
+        $attendance_row = $check_result->fetch_assoc();
+        $attendance_id = (int) $attendance_row['id'];
+        if ($attendance_row['status'] === 'Present' && $attendance_row['time'] === $time) {
+            echo json_encode(["success" => true, "std_id" => $std_id, "already_present" => true]);
         } else {
-            echo json_encode(["error" => "Failed to update attendance: " . $con->error]);
+            $update_stmt = $con->prepare("UPDATE attendance
+                                          SET status = 'Present', time = ?
+                                          WHERE id = ? AND status = ? AND time = ?");
+            $update_stmt->bind_param("siss", $time, $attendance_id, $attendance_row['status'], $attendance_row['time']);
+            if ($update_stmt->execute() && $update_stmt->affected_rows === 1) {
+            $_SESSION['last_scan_undo'] = [
+                "course_id" => (string) $course_id,
+                "attendance_id" => $attendance_id,
+                "student_id" => $std_id,
+                "previous_status" => $attendance_row['status'],
+                "previous_time" => $attendance_row['time'],
+                "date" => $date,
+                "scan_time" => $time
+            ];
+            echo json_encode(["success" => true, "std_id" => $std_id, "updated" => true]);
+            } else {
+                http_response_code(409);
+                echo json_encode(["error" => "The attendance record changed before the scan could be applied."]);
+            }
+            $update_stmt->close();
         }
     } else {
         //  Insert new if not found
         $insert_sql = "INSERT INTO attendance (course_id, student_id, status, date, time) 
      VALUES ('$course_code', '$std_id', 'Present', '$date', '$time')";
         if ($con->query($insert_sql)) {
+            $_SESSION['last_scan_undo'] = [
+                "course_id" => (string) $course_id,
+                "attendance_id" => (int) $con->insert_id,
+                "student_id" => $std_id,
+                "previous_status" => null,
+                "previous_time" => null,
+                "date" => $date,
+                "scan_time" => $time
+            ];
             echo json_encode(["success" => true, "std_id" => $std_id, "inserted" => true]);
         } else {
             echo json_encode(["error" => "Failed to insert attendance: " . $con->error]);
@@ -150,6 +218,11 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             </div>
         </div>
 
+        <div class="page-actions">
+            <a class="page-action" href="instructor-panel.php">Back to Instructor Panel</a>
+            <button class="page-action" id="undo-scan-button" type="button" <?php echo $can_undo_scan ? '' : 'disabled'; ?>>Undo Last Scan</button>
+        </div>
+
         <div class="main-qr-container">
             <p class="qr-info">Scan The Qr Code With your device while logged in with your ID to get your attendance
                 counted</p>
@@ -191,6 +264,37 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
     <script>
         const course_id = <?php echo json_encode($course_id); ?>;
         let currentQRText = null; // Global variable for QR text
+
+        document.getElementById("undo-scan-button").addEventListener("click", async function () {
+            this.disabled = true;
+            try {
+                const response = await fetch(window.location.href, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "undo_last_scan=1"
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    alert(result.error || "Unable to undo the last scan.");
+                    return;
+                }
+
+                const scanRow = [...document.querySelectorAll(".qr-row[data-student-id]")]
+                    .find(row => row.dataset.studentId === result.std_id);
+                if (scanRow) scanRow.remove();
+
+                const updateTable = document.querySelector(".qr-update-table");
+                if (!updateTable.querySelector(".qr-row[data-student-id]")) {
+                    const noScanMessage = document.createElement("div");
+                    noScanMessage.className = "no-scan-msg";
+                    noScanMessage.textContent = "No one has scanned yet.";
+                    updateTable.appendChild(noScanMessage);
+                }
+            } catch (error) {
+                alert("Unable to undo the last scan. Please try again.");
+                this.disabled = false;
+            }
+        });
 
         document.addEventListener("DOMContentLoaded", function () {
             const qrContainer = document.querySelector(".qr-scan");
@@ -295,6 +399,7 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                                     // Create new row
                                     const newRow = document.createElement("div");
                                     newRow.className = "qr-row";
+                                    newRow.dataset.studentId = result.std_id;
                                     newRow.innerHTML = `
                                                             <div class="qr-cl-id">${result.std_id}</div>
                                                             <div class="qr-cl-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -304,6 +409,7 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                                     // Insert the new row at the top (right after the header)
                                     const head = updateTable.querySelector(".qr-update-head");
                                     updateTable.insertBefore(newRow, head.nextSibling);
+                                    document.getElementById("undo-scan-button").disabled = !(result.updated || result.inserted);
 
                                 } else {
                                     alert("❌ Failed to record attendance.");
