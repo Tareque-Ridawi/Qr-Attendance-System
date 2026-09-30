@@ -793,6 +793,34 @@ Qr Scan Page Page Styles (Also Used in Attendance records)
     color:var(--theme);
     font-size: 18px;
 }
+.page-actions{
+    display:flex;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:15px 100px 0;
+}
+.page-action{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px 16px;
+    border:1px solid var(--theme);
+    border-radius:4px;
+    background-color:var(--theme);
+    color:var(--theme-2);
+    font-family:var(--font-body);
+    text-decoration:none;
+    cursor:pointer;
+}
+.page-action:hover:not(:disabled){
+    background-color:var(--theme-1-03);
+    color:var(--theme);
+}
+.page-action:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+}
 .qr-update-txt{
     background-color: var(--theme-1-03);
     padding:5px 10px;
@@ -811,6 +839,34 @@ Qr Scan Page Page Styles (Also Used in Attendance records)
 .qr-update-head{
     background-color: var(--theme);
     color:var(--theme-2);
+}
+.qr-cl-status{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    text-align:right;
+}
+.scan-failure{
+    color:#a32626;
+}
+.scan-success{
+    color:#197144;
+}
+.scan-reason{
+    max-width:240px;
+    font-size:12px;
+    font-weight:400;
+    text-align:right;
+}
+.scan-feedback{
+    margin:12px 100px;
+    color:var(--theme);
+}
+.scan-feedback-success{
+    color:#197144;
+}
+.scan-feedback-failure{
+    color:#a32626;
 }
 .qr-row:not(:last-child){
     border-bottom: 1px solid var(--theme);
@@ -936,6 +992,7 @@ label{
 .form-class label input{
     width: 90%;
     background: rgba(255,255,255,0.2);
+    color: white;
     border: none;
     outline: none;
     padding:10px 20px;
@@ -1266,6 +1323,9 @@ Responsive Design
         margin:20px;
         font-size: 12px;
     } 
+    .page-actions{
+        margin:15px 20px 0;
+    }
     
     
 

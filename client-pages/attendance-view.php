@@ -144,6 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
+        <div class="page-actions">
+            <a class="page-action" href="instructor-panel.php">Back to Instructor Panel</a>
+        </div>
+
         <div class="qr-updates">
             <div class="abt-std-top mrg-btm act">
                 <span class="abt-std-in flex cust">Students Enrolled</span>
@@ -239,15 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     </main>
-    <footer>
-        <div class="logo-container">
-            <img src="../assets/logo.png" alt="">
-        </div>
-        <div class="foot-info">
-            <p class="foot-title">QR Code Based Attendance System</p>
-            <p class="foot-abt">&copy; 2025 . All Rights Reserved . Developed by <span>Super Developer</span></p>
-        </div>
-    </footer>
+    <?php include("../includes/footer.php"); ?>
 </body>
 <script>
     document.querySelector(".abt-std-btn").addEventListener("click", function() {

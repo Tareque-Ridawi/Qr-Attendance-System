@@ -30,7 +30,51 @@ $course = $course_result->fetch_assoc();
 $course_title = $course['course_title'];
 $course_code = $course['course_id'];
 
-if ($course_code) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['set_scan_location'])) {
+    header('Content-Type: application/json');
+    $latitude = $_POST['latitude'] ?? null;
+    $longitude = $_POST['longitude'] ?? null;
+
+    if (!is_numeric($latitude) || !is_numeric($longitude)
+        || (float) $latitude < -90 || (float) $latitude > 90
+        || (float) $longitude < -180 || (float) $longitude > 180) {
+        http_response_code(400);
+        echo json_encode(["error" => "A valid instructor location is required."]);
+        exit();
+    }
+
+    $_SESSION['scan_location'][$course_id] = [
+        "latitude" => (float) $latitude,
+        "longitude" => (float) $longitude,
+        "captured_at" => time()
+    ];
+    echo json_encode(["success" => true]);
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_attendance'])) {
+    header('Content-Type: application/json');
+    $attendance_date = date("Y-m-d");
+    $delete_stmt = $con->prepare("DELETE FROM attendance WHERE course_id = ? AND date = ?");
+    if (!$delete_stmt) {
+        http_response_code(500);
+        echo json_encode(["error" => "Could not prepare attendance deletion."]);
+        exit();
+    }
+
+    $delete_stmt->bind_param("ss", $course_code, $attendance_date);
+    if ($delete_stmt->execute()) {
+        $_SESSION['deleted_attendance_date'][$course_id] = $attendance_date;
+        echo json_encode(["success" => true, "deleted" => $delete_stmt->affected_rows, "date" => $attendance_date]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["error" => "Failed to delete today's attendance records."]);
+    }
+    $delete_stmt->close();
+    exit();
+}
+
+if ($course_code && ($_SESSION['deleted_attendance_date'][$course_id] ?? null) !== date("Y-m-d")) {
     // ✅ Auto-mark all students as Absent on page load (if not already marked)
     $date = date("Y-m-d");
     $time = "00:00:00";
@@ -60,6 +104,37 @@ if ($course_code) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student_id']) && isset($_POST['qr_data'])) {
     $student_id = $con->real_escape_string($_POST['student_id']);
     $qr_data = $con->real_escape_string($_POST['qr_data']);
+    $student_latitude = $_POST['latitude'] ?? null;
+    $student_longitude = $_POST['longitude'] ?? null;
+    $instructor_location = $_SESSION['scan_location'][$course_id] ?? null;
+
+    if (!is_numeric($student_latitude) || !is_numeric($student_longitude)
+        || (float) $student_latitude < -90 || (float) $student_latitude > 90
+        || (float) $student_longitude < -180 || (float) $student_longitude > 180) {
+        http_response_code(400);
+        echo json_encode(["error" => "Student location is unavailable. Allow location access and scan again."]);
+        exit();
+    }
+
+    if (!$instructor_location || time() - $instructor_location['captured_at'] > 300) {
+        http_response_code(409);
+        echo json_encode(["error" => "Instructor location is unavailable or expired. Refresh the attendance page."]);
+        exit();
+    }
+
+    $latitude_delta = deg2rad((float) $student_latitude - $instructor_location['latitude']);
+    $longitude_delta = deg2rad((float) $student_longitude - $instructor_location['longitude']);
+    $haversine = sin($latitude_delta / 2) ** 2
+        + cos(deg2rad($instructor_location['latitude']))
+        * cos(deg2rad((float) $student_latitude))
+        * sin($longitude_delta / 2) ** 2;
+    $distance_meters = 6371000 * 2 * atan2(sqrt($haversine), sqrt(1 - $haversine));
+
+    if ($distance_meters > 150) {
+        http_response_code(403);
+        echo json_encode(["error" => "Attendance can only be recorded near the instructor's location."]);
+        exit();
+    }
 
     // Initialize std_id to avoid undefined variable
     $std_id = null;
@@ -86,19 +161,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['student_id']) && isset
     $time = date("H:i:s");
 
     //  Update attendance if already marked as Absent, else insert as Present
-    $check_sql = "SELECT id FROM attendance 
+    $check_sql = "SELECT id, status, time FROM attendance 
 WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' LIMIT 1";
     $check_result = $con->query($check_sql);
 
     if ($check_result && $check_result->num_rows > 0) {
-        //  Already exists: update status and time
-        $update_sql = "UPDATE attendance 
-     SET status = 'Present', time = '$time' 
-     WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date'";
-        if ($con->query($update_sql)) {
-            echo json_encode(["success" => true, "std_id" => $std_id, "updated" => true]);
+        $attendance_row = $check_result->fetch_assoc();
+        $attendance_id = (int) $attendance_row['id'];
+        if ($attendance_row['status'] === 'Present' && $attendance_row['time'] === $time) {
+            echo json_encode(["success" => true, "std_id" => $std_id, "already_present" => true]);
         } else {
-            echo json_encode(["error" => "Failed to update attendance: " . $con->error]);
+            $update_stmt = $con->prepare("UPDATE attendance
+                                          SET status = 'Present', time = ?
+                                          WHERE id = ? AND status = ? AND time = ?");
+            $update_stmt->bind_param("siss", $time, $attendance_id, $attendance_row['status'], $attendance_row['time']);
+            if ($update_stmt->execute() && $update_stmt->affected_rows === 1) {
+                echo json_encode(["success" => true, "std_id" => $std_id, "updated" => true]);
+            } else {
+                http_response_code(409);
+                echo json_encode(["error" => "The attendance record changed before the scan could be applied."]);
+            }
+            $update_stmt->close();
         }
     } else {
         //  Insert new if not found
@@ -150,12 +233,19 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             </div>
         </div>
 
+        <div class="page-actions">
+            <a class="page-action" href="instructor-panel.php">Back to Instructor Panel</a>
+            <button class="page-action" id="delete-attendance-button" type="button">Delete Attendance</button>
+        </div>
+
         <div class="main-qr-container">
             <p class="qr-info">Scan The Qr Code With your device while logged in with your ID to get your attendance
                 counted</p>
             <div class="qr-scan">
                 <img src="../assets/logo.png" alt="">
             </div>
+            <p id="location-status" role="status">Getting instructor location before generating the attendance QR code...</p>
+            <button class="page-action" id="retry-location-button" type="button">Retry Location</button>
             <div class="qr-reset-time">
                 Code Resets in <span>15</span> Seconds
             </div>
@@ -166,9 +256,9 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             <p class="qr-update-txt">Updates:</p>
             <div class="qr-update-table">
                 <div class="qr-update-head">
-                    <div class="id">ID</div>
+                                    <div class="id">Student</div>
                     <div class="time">Time</div>
-                    <div class="status">Status</div>
+                                    <div class="status">Result</div>
                 </div>
 
                 <div class="no-scan-msg">No one has scanned yet.</div>
@@ -176,15 +266,7 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
         </div>
 
     </main>
-    <footer>
-        <div class="logo-container">
-            <img src="../assets/logo.png" alt="">
-        </div>
-        <div class="foot-info">
-            <p class="foot-title">QR Code Based Attendance System</p>
-            <p class="foot-abt">&copy; 2025 . All Rights Reserved . Developed by <span>Super Developer</span></p>
-        </div>
-    </footer>
+    <?php include("../includes/footer.php"); ?>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -192,8 +274,99 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
         const course_id = <?php echo json_encode($course_id); ?>;
         let currentQRText = null; // Global variable for QR text
 
+        document.getElementById("delete-attendance-button").addEventListener("click", async function () {
+            if (!confirm("Delete all attendance records for this course today? This cannot be undone.")) {
+                return;
+            }
+
+            this.disabled = true;
+            try {
+                const response = await fetch(window.location.href, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "delete_attendance=1"
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    alert(result.error || "Unable to delete today's attendance.");
+                    this.disabled = false;
+                    return;
+                }
+
+                const updateTable = document.querySelector(".qr-update-table");
+                updateTable.querySelectorAll(".qr-row, .no-scan-msg").forEach(row => row.remove());
+                const message = document.createElement("div");
+                message.className = "no-scan-msg";
+                message.textContent = `Deleted ${result.deleted} attendance record(s) for ${result.date}.`;
+                updateTable.appendChild(message);
+            } catch (error) {
+                alert("Unable to delete today's attendance. Please try again.");
+                this.disabled = false;
+            }
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const qrContainer = document.querySelector(".qr-scan");
+            const locationStatus = document.getElementById("location-status");
+            const retryLocationButton = document.getElementById("retry-location-button");
+
+            function getBrowserLocation() {
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error("This browser does not provide location services."));
+                        return;
+                    }
+
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: false,
+                        maximumAge: 30000,
+                        timeout: 15000
+                    });
+                });
+            }
+
+            async function captureInstructorLocation(showProgress = true) {
+                if (showProgress) {
+                    locationStatus.textContent = "Getting instructor location...";
+                    retryLocationButton.disabled = true;
+                }
+
+                try {
+                    const position = await getBrowserLocation();
+                    const response = await fetch(window.location.href, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            set_scan_location: "1",
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        })
+                    });
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.error || "Could not save the instructor location.");
+                    }
+                    locationStatus.textContent = "Instructor location ready. GPS is not specifically required.";
+                    return true;
+                } catch (error) {
+                    locationStatus.textContent = error.message || "Location unavailable. Allow browser location access and retry.";
+                    throw error;
+                } finally {
+                    retryLocationButton.disabled = false;
+                }
+            }
+
+            retryLocationButton.addEventListener("click", async () => {
+                try {
+                    await captureInstructorLocation();
+                    if (!qrContainer.querySelector("canvas, img")) {
+                        generateQRCode();
+                        startCountdown();
+                    }
+                } catch (error) {
+                    // Keep the QR code unavailable until an instructor location has been stored.
+                }
+            });
 
             function generateQRCodeString() {
                 const chars = "abcdefghijklmnopqrstuvwxyz";
@@ -233,8 +406,13 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             }
 
             if (qrContainer) {
-                generateQRCode();
-                startCountdown();
+                captureInstructorLocation()
+                    .then(() => {
+                        generateQRCode();
+                        startCountdown();
+                        window.setInterval(() => captureInstructorLocation(false).catch(() => {}), 60000);
+                    })
+                    .catch(() => {});
             }
         });
 
@@ -269,53 +447,78 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                     const data = snapshot.val();
                     console.log("New scan received:", data);
 
-                    if (!data.qr_data || !data.student_id) {
-                        console.error("❌ Missing QR data or student_id in snapshot!");
+                    if (!data.student_id) {
+                        console.error("Scan event has no student ID.");
                         return;
                     }
 
-                    if (data.qr_data === currentQRText) {
-                        fetch(window.location.href, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: `student_id=${encodeURIComponent(data.student_id)}&qr_data=${encodeURIComponent(data.qr_data)}&course_id=${encodeURIComponent(course_id)}`
-                        })
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.success) {
-                                    //  Inject the scanned student's data into the update table
-                                    const updateTable = document.querySelector(".qr-update-table");
+                    const studentName = data.student_name || `Student ${data.student_id}`;
+                    const timestampText = data.timestamp
+                        ? new Date(data.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    const table = document.querySelector(".qr-update-table");
+                    const emptyMessage = table.querySelector(".no-scan-msg");
+                    if (emptyMessage) emptyMessage.remove();
 
-                                    // Remove the "No one has scanned yet" message if it exists
-                                    const noScanMsg = updateTable.querySelector(".no-scan-msg");
-                                    if (noScanMsg) noScanMsg.remove();
+                    const row = document.createElement("div");
+                    row.className = "qr-row scan-result";
+                    row.dataset.studentId = data.student_id;
+                    const nameCell = document.createElement("div");
+                    nameCell.className = "qr-cl-id";
+                    nameCell.textContent = studentName;
+                    const timeCell = document.createElement("div");
+                    timeCell.className = "qr-cl-time";
+                    timeCell.textContent = timestampText;
+                    const resultCell = document.createElement("div");
+                    resultCell.className = "qr-cl-status";
+                    row.append(nameCell, timeCell, resultCell);
+                    table.insertBefore(row, table.querySelector(".qr-update-head").nextSibling);
 
-                                    // Create new row
-                                    const newRow = document.createElement("div");
-                                    newRow.className = "qr-row";
-                                    newRow.innerHTML = `
-                                                            <div class="qr-cl-id">${result.std_id}</div>
-                                                            <div class="qr-cl-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                            <div class="qr-cl-status">Success</div>
-                                                        `;
-
-                                    // Insert the new row at the top (right after the header)
-                                    const head = updateTable.querySelector(".qr-update-head");
-                                    updateTable.insertBefore(newRow, head.nextSibling);
-
-                                } else {
-                                    alert("❌ Failed to record attendance.");
-                                }
-                            })
-                            .catch(error => console.error("❌ Fetch error:", error));
-
-                        //  Delete scanned QR from Firebase
-                        snapshot.ref.remove();
-                    } else {
-                        alert("❌ Invalid QR Code");
+                    async function finishScan(success, reason) {
+                        resultCell.className = `qr-cl-status scan-${success ? "success" : "failure"}`;
+                        resultCell.textContent = success ? "Successful" : "Failed";
+                        if (reason) {
+                            const reasonText = document.createElement("small");
+                            reasonText.className = "scan-reason";
+                            reasonText.textContent = reason;
+                            resultCell.appendChild(reasonText);
+                        }
+                        await snapshot.ref.update({
+                            scan_result: success ? "success" : "failed",
+                            scan_reason: reason || "Attendance recorded.",
+                            processed_at: new Date().toISOString()
+                        });
+                        window.setTimeout(() => snapshot.ref.remove(), 30000);
                     }
+
+                    if (!data.qr_data || data.qr_data !== currentQRText) {
+                        finishScan(false, "The QR code is invalid or has expired.")
+                            .catch(error => console.error("Could not return scan result:", error));
+                        lastTimestamp = data.timestamp;
+                        return;
+                    }
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            student_id: data.student_id,
+                            qr_data: data.qr_data,
+                            course_id: course_id,
+                            latitude: data.latitude,
+                            longitude: data.longitude
+                        })
+                    })
+                        .then(async response => {
+                            const result = await response.json();
+                            if (!response.ok || !result.success) {
+                                throw new Error(result.error || "Attendance could not be recorded.");
+                            }
+                            return result;
+                        })
+                        .then(() => finishScan(true, "Attendance recorded."))
+                        .catch(error => finishScan(false, error.message || "The attendance request failed."))
+                        .catch(error => console.error("Could not return scan result:", error));
 
                     lastTimestamp = data.timestamp;
                 });

@@ -132,6 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                 </div>
             </div>
         </div>
+        <p id="scan-feedback" class="scan-feedback" role="status" aria-live="polite"></p>
 
         <!--
         <div class="attendance-result">
@@ -298,15 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
         </div>
 
     </main>
-    <footer>
-        <div class="logo-container">
-            <img src="../assets/logo.png" alt="">
-        </div>
-        <div class="foot-info">
-            <p class="foot-title">QR Code Based Attendance System</p>
-            <p class="foot-abt">&copy; 2025 . All Rights Reserved . Developed by <span>Super Developer</span></p>
-        </div>
-    </footer>
+    <?php include("../includes/footer.php"); ?>
 
     <script>
         /*-------------------------------------------------
@@ -390,8 +383,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
 
             //  QR Code Scanner (Click on Logo to Scan)
             const img = document.querySelector('img[alt="Main Logo"]');
+            const scanFeedback = document.getElementById("scan-feedback");
 
-            img.addEventListener("click", function () {
+            img.addEventListener("click", async function () {
+                scanFeedback.textContent = "Getting your location...";
+                scanFeedback.className = "scan-feedback";
+                let studentPosition;
+                try {
+                    if (!navigator.geolocation) {
+                        throw new Error("This browser does not provide location services.");
+                    }
+                    studentPosition = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            enableHighAccuracy: false,
+                            maximumAge: 30000,
+                            timeout: 15000
+                        });
+                    });
+                } catch (error) {
+                    scanFeedback.textContent = "Attendance failed: location is unavailable. Allow browser location access and try again. GPS is not specifically required.";
+                    scanFeedback.classList.add("scan-feedback-failure");
+                    return;
+                }
+
                 const overlay = document.createElement("div");
                 overlay.style.position = "fixed";
                 overlay.style.top = "0";
@@ -417,6 +431,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                 document.body.appendChild(overlay);
 
                 const html5QrCode = new Html5Qrcode("qr-reader");
+                let scanSubmitted = false;
                 html5QrCode.start({
                     facingMode: "environment"
                 }, // Back Camera
@@ -425,22 +440,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["full_name"], $_POST["e
                         qrbox: 250
                     },
                     (decodedText) => {
-                        //  Send scanned data to Firebase
-                        db.ref("attendance").push({
-                            student_id: "<?= $user_data['id']; ?>",
+                        if (scanSubmitted) return;
+                        scanSubmitted = true;
+                        scanFeedback.textContent = "Scan received. Waiting for attendance verification...";
+                        scanFeedback.className = "scan-feedback";
+                        const scanReference = db.ref("attendance").push();
+                        let hasFinalResult = false;
+                        scanReference.on("value", (snapshot) => {
+                            const scanResult = snapshot.val();
+                            if (!scanResult || !scanResult.scan_result) return;
+                            hasFinalResult = true;
+
+                            if (scanResult.scan_result === "success") {
+                                scanFeedback.textContent = "Attendance recorded successfully.";
+                                scanFeedback.classList.add("scan-feedback-success");
+                            } else {
+                                scanFeedback.textContent = `Attendance failed: ${scanResult.scan_reason || "Reason not provided."}`;
+                                scanFeedback.classList.add("scan-feedback-failure");
+                            }
+                            scanReference.off("value");
+                        });
+
+                        scanReference.set({
+                            student_id: <?php echo json_encode((string) $user_data['id']); ?>,
+                            student_name: <?php echo json_encode($user_data['name']); ?>,
                             qr_data: decodedText,
+                            latitude: studentPosition.coords.latitude,
+                            longitude: studentPosition.coords.longitude,
+                            location_accuracy: studentPosition.coords.accuracy,
                             timestamp: new Date().toISOString()
                         }).then(() => {
-                            alert("Scan successful!");
+                            if (!hasFinalResult) {
+                                scanFeedback.textContent = "Scan sent. Waiting for the instructor's attendance check...";
+                            }
                         }).catch((error) => {
-                            console.error("Error saving to Firebase:", error);
+                            scanReference.off("value");
+                            scanFeedback.textContent = `Attendance failed: scan could not be submitted (${error.message}).`;
+                            scanFeedback.classList.add("scan-feedback-failure");
                         });
 
                         html5QrCode.stop();
                         overlay.remove();
                     },
                     (error) => { }
-                );
+                ).catch((error) => {
+                    scanFeedback.textContent = `Attendance failed: the camera could not start (${error.message}).`;
+                    scanFeedback.className = "scan-feedback scan-feedback-failure";
+                    overlay.remove();
+                });
 
                 overlay.addEventListener("click", function (e) {
                     if (e.target === overlay) {
