@@ -840,6 +840,34 @@ Qr Scan Page Page Styles (Also Used in Attendance records)
     background-color: var(--theme);
     color:var(--theme-2);
 }
+.qr-cl-status{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    text-align:right;
+}
+.scan-failure{
+    color:#a32626;
+}
+.scan-success{
+    color:#197144;
+}
+.scan-reason{
+    max-width:240px;
+    font-size:12px;
+    font-weight:400;
+    text-align:right;
+}
+.scan-feedback{
+    margin:12px 100px;
+    color:var(--theme);
+}
+.scan-feedback-success{
+    color:#197144;
+}
+.scan-feedback-failure{
+    color:#a32626;
+}
 .qr-row:not(:last-child){
     border-bottom: 1px solid var(--theme);
 }

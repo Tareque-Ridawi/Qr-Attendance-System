@@ -256,9 +256,9 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
             <p class="qr-update-txt">Updates:</p>
             <div class="qr-update-table">
                 <div class="qr-update-head">
-                    <div class="id">ID</div>
+                                    <div class="id">Student</div>
                     <div class="time">Time</div>
-                    <div class="status">Status</div>
+                                    <div class="status">Result</div>
                 </div>
 
                 <div class="no-scan-msg">No one has scanned yet.</div>
@@ -447,60 +447,78 @@ WHERE course_id = '$course_code' AND student_id = '$std_id' AND date = '$date' L
                     const data = snapshot.val();
                     console.log("New scan received:", data);
 
-                    if (!data.qr_data || !data.student_id) {
-                        console.error("❌ Missing QR data or student_id in snapshot!");
+                    if (!data.student_id) {
+                        console.error("Scan event has no student ID.");
                         return;
                     }
 
-                    if (data.qr_data === currentQRText) {
-                        fetch(window.location.href, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: new URLSearchParams({
-                                student_id: data.student_id,
-                                qr_data: data.qr_data,
-                                course_id: course_id,
-                                latitude: data.latitude,
-                                longitude: data.longitude
-                            })
-                        })
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.success) {
-                                    //  Inject the scanned student's data into the update table
-                                    const updateTable = document.querySelector(".qr-update-table");
+                    const studentName = data.student_name || `Student ${data.student_id}`;
+                    const timestampText = data.timestamp
+                        ? new Date(data.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    const table = document.querySelector(".qr-update-table");
+                    const emptyMessage = table.querySelector(".no-scan-msg");
+                    if (emptyMessage) emptyMessage.remove();
 
-                                    // Remove the "No one has scanned yet" message if it exists
-                                    const noScanMsg = updateTable.querySelector(".no-scan-msg");
-                                    if (noScanMsg) noScanMsg.remove();
+                    const row = document.createElement("div");
+                    row.className = "qr-row scan-result";
+                    row.dataset.studentId = data.student_id;
+                    const nameCell = document.createElement("div");
+                    nameCell.className = "qr-cl-id";
+                    nameCell.textContent = studentName;
+                    const timeCell = document.createElement("div");
+                    timeCell.className = "qr-cl-time";
+                    timeCell.textContent = timestampText;
+                    const resultCell = document.createElement("div");
+                    resultCell.className = "qr-cl-status";
+                    row.append(nameCell, timeCell, resultCell);
+                    table.insertBefore(row, table.querySelector(".qr-update-head").nextSibling);
 
-                                    // Create new row
-                                    const newRow = document.createElement("div");
-                                    newRow.className = "qr-row";
-                                    newRow.dataset.studentId = result.std_id;
-                                    newRow.innerHTML = `
-                                                            <div class="qr-cl-id">${result.std_id}</div>
-                                                            <div class="qr-cl-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                            <div class="qr-cl-status">Success</div>
-                                                        `;
-
-                                    // Insert the new row at the top (right after the header)
-                                    const head = updateTable.querySelector(".qr-update-head");
-                                    updateTable.insertBefore(newRow, head.nextSibling);
-
-                                } else {
-                                    alert(result.error || "Failed to record attendance.");
-                                }
-                            })
-                            .catch(error => console.error("❌ Fetch error:", error));
-
-                        //  Delete scanned QR from Firebase
-                        snapshot.ref.remove();
-                    } else {
-                        alert("❌ Invalid QR Code");
+                    async function finishScan(success, reason) {
+                        resultCell.className = `qr-cl-status scan-${success ? "success" : "failure"}`;
+                        resultCell.textContent = success ? "Successful" : "Failed";
+                        if (reason) {
+                            const reasonText = document.createElement("small");
+                            reasonText.className = "scan-reason";
+                            reasonText.textContent = reason;
+                            resultCell.appendChild(reasonText);
+                        }
+                        await snapshot.ref.update({
+                            scan_result: success ? "success" : "failed",
+                            scan_reason: reason || "Attendance recorded.",
+                            processed_at: new Date().toISOString()
+                        });
+                        window.setTimeout(() => snapshot.ref.remove(), 30000);
                     }
+
+                    if (!data.qr_data || data.qr_data !== currentQRText) {
+                        finishScan(false, "The QR code is invalid or has expired.")
+                            .catch(error => console.error("Could not return scan result:", error));
+                        lastTimestamp = data.timestamp;
+                        return;
+                    }
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            student_id: data.student_id,
+                            qr_data: data.qr_data,
+                            course_id: course_id,
+                            latitude: data.latitude,
+                            longitude: data.longitude
+                        })
+                    })
+                        .then(async response => {
+                            const result = await response.json();
+                            if (!response.ok || !result.success) {
+                                throw new Error(result.error || "Attendance could not be recorded.");
+                            }
+                            return result;
+                        })
+                        .then(() => finishScan(true, "Attendance recorded."))
+                        .catch(error => finishScan(false, error.message || "The attendance request failed."))
+                        .catch(error => console.error("Could not return scan result:", error));
 
                     lastTimestamp = data.timestamp;
                 });
